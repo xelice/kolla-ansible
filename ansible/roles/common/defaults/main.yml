@@ -17,6 +17,7 @@ common_services:
     environment:
       ANSIBLE_NOCOLOR: "1"
       ANSIBLE_LIBRARY: "/usr/share/ansible"
+      REQUESTS_CA_BUNDLE: "{{ openstack_cacert }}"
     privileged: True
     volumes: "{{ kolla_toolbox_default_volumes + kolla_toolbox_extra_volumes + lookup('vars', 'run_default_volumes_' + kolla_container_engine) }}"
     dimensions: "{{ kolla_toolbox_dimensions }}"
@@ -182,6 +183,8 @@ fluentd_input_openstack_services:
     enabled: "{{ enable_nova | bool }}"
   - name: octavia
     enabled: "{{ enable_octavia | bool }}"
+  - name: placement
+    enabled: "{{ enable_placement | bool }}"
   - name: tacker
     enabled: "{{ enable_tacker | bool }}"
   - name: trove

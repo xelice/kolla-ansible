@@ -5,15 +5,18 @@
 ansible_python_interpreter: /usr/bin/python3
 {% endif %}
 
-# NOTE(yoctozepto): In CI it makes sense to always try to fail
-# as early as possible.
-kolla_ansible_setup_any_errors_fatal: true
-
 kolla_base_distro: "{{ base_distro }}"
 network_interface: "{{ api_interface_name }}"
 network_address_family: "{{ address_family }}"
 kolla_container_engine: "{{ container_engine }}"
 docker_restart_policy: "no"
+{% if base_distro_version is defined and base_distro_version == "noble" %}
+distro_python_version: "3.12"
+kolla_base_distro_version: "noble"
+{% endif %}
+
+docker_apt_url: "http://{{ zuul_site_mirror_fqdn }}:8080/docker/{{ ansible_facts.distribution | lower }}"
+docker_yum_url: "http://{{ zuul_site_mirror_fqdn }}:8080/docker/centos"
 
 {% if container_engine == 'podman' %}
 podman_debug: true
@@ -126,6 +129,8 @@ enable_aodh: "yes"
 
 {% if scenario == "ironic" %}
 enable_ironic: "yes"
+enable_prometheus: "yes"
+enable_prometheus_openstack_exporter: "no"
 ironic_dnsmasq_dhcp_ranges:
   - range: "10.42.0.2,10.42.0.254,255.255.255.0"
 {% endif %}
@@ -158,7 +163,7 @@ enable_redis: "yes"
 
 enable_ceph_rgw: "yes"
 ceph_rgw_hosts:
-{% for host in hostvars %}
+{% for host in hostvars | reject('equalto', 'localhost') %}
   - host: {{ host }}
     ip: {{ hostvars[host]['ansible_host'] }}
     port: 6780
@@ -189,6 +194,7 @@ enable_octavia: "yes"
 octavia_provider_drivers: "ovn:OVN provider"
 octavia_provider_agents: "ovn"
 enable_redis: "yes"
+neutron_dns_domain: "example.org."
 {% endif %}
 
 {% if scenario == "prometheus-opensearch" %}
@@ -245,7 +251,7 @@ horizon_external_fqdn: "horizon.external"
 keystone_external_fqdn: "keystone.external"
 neutron_external_fqdn: "neutron.external"
 nova_external_fqdn: "nova.external"
-nova_novncproxy_external_fqdn: "novncproxy.external"
+nova_novncproxy_fqdn: "novncproxy.external"
 placement_external_fqdn: "placement.external"
 {% endif %}
 

@@ -36,6 +36,12 @@
         label: ubuntu-jammy
 
 - nodeset:
+    name: kolla-ansible-noble
+    nodes:
+      - name: primary
+        label: ubuntu-noble
+
+- nodeset:
     name: kolla-ansible-debian-bookworm-multi
     nodes:
       - name: primary
@@ -44,12 +50,6 @@
         label: debian-bookworm
       - name: secondary2
         label: debian-bookworm
-
-- nodeset:
-    name: kolla-ansible-openeuler-22.03-lts
-    nodes:
-      - name: primary
-        label: openEuler-22-03-LTS
 
 - nodeset:
     name: kolla-ansible-rocky9
@@ -68,6 +68,16 @@
         label: ubuntu-jammy
 
 - nodeset:
+    name: kolla-ansible-noble-multi
+    nodes:
+      - name: primary
+        label: ubuntu-noble
+      - name: secondary1
+        label: ubuntu-noble
+      - name: secondary2
+        label: ubuntu-noble
+
+- nodeset:
     name: kolla-ansible-rocky9-multi
     nodes:
       - name: primary
@@ -82,6 +92,12 @@
     nodes:
       - name: primary
         label: nested-virt-ubuntu-jammy
+
+- nodeset:
+    name: kolla-ansible-noble-nested-virt
+    nodes:
+      - name: primary
+        label: nested-virt-ubuntu-noble
 
 - nodeset:
     name: kolla-ansible-rocky9-nested-virt
@@ -100,6 +116,18 @@
         label: ubuntu-jammy
       - name: ternary2
         label: ubuntu-jammy
+
+- nodeset:
+    name: kolla-ansible-noble-masakari
+    nodes:
+      - name: primary
+        label: ubuntu-noble
+      - name: secondary
+        label: ubuntu-noble
+      - name: ternary1
+        label: ubuntu-noble
+      - name: ternary2
+        label: ubuntu-noble
 
 - nodeset:
     name: kolla-ansible-rocky9-masakari

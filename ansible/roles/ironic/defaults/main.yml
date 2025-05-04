@@ -82,6 +82,7 @@ ironic_services:
     enabled: true
     cap_add:
       - NET_ADMIN
+      - NET_RAW
     image: "{{ ironic_dnsmasq_image_full }}"
     volumes: "{{ ironic_dnsmasq_default_volumes + ironic_dnsmasq_extra_volumes }}"
     dimensions: "{{ ironic_dnsmasq_dimensions }}"
@@ -222,6 +223,7 @@ ironic_api_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla"
+  - "{{ '/dev/shm:/dev/shm' if om_enable_queue_manager | bool else '' }}"
   - "{{ kolla_dev_repos_directory ~ '/ironic/ironic:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/ironic' if ironic_dev_mode | bool else '' }}"
 ironic_conductor_default_volumes:
   - "{{ node_config_directory }}/ironic-conductor/:{{ container_config_directory }}/:ro"
@@ -234,7 +236,7 @@ ironic_conductor_default_volumes:
   - "kolla_logs:/var/log/kolla"
   - "ironic:/var/lib/ironic"
   - "{{ kolla_dev_repos_directory ~ '/ironic/ironic:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/ironic' if ironic_dev_mode | bool else '' }}"
-  - "{{ 'ironic_prometheus_exporter_data:/var/lib/ironic/metrics' if enable_ironic_prometheus_exporter | bool else '' }}"
+  - "{{ 'ironic_prometheus_exporter_data:/var/lib/ironic-metrics' if enable_ironic_prometheus_exporter | bool else '' }}"
 ironic_tftp_default_volumes:
   - "{{ node_config_directory }}/ironic-tftp/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
@@ -265,7 +267,7 @@ ironic_prometheus_exporter_default_volumes:
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ '/etc/timezone:/etc/timezone:ro' if ansible_facts.os_family == 'Debian' else '' }}"
   - "kolla_logs:/var/log/kolla"
-  - "ironic_prometheus_exporter_data:/var/lib/ironic/metrics"
+  - "ironic_prometheus_exporter_data:/var/lib/ironic-metrics"
 
 ironic_extra_volumes: "{{ default_extra_volumes }}"
 ironic_api_extra_volumes: "{{ ironic_extra_volumes }}"
@@ -369,6 +371,9 @@ ironic_ks_user_roles:
     user: "{{ ironic_keystone_user }}"
     role: "service"
   - project: "service"
+    user: "{{ ironic_inspector_keystone_user }}"
+    role: "service"
+  - system: "all"
     user: "{{ ironic_inspector_keystone_user }}"
     role: "service"
 
